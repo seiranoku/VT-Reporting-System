@@ -18,6 +18,41 @@ export type ProjectInput = {
   environment: string;
 };
 
+export type ScanStartResult = {
+  project: {
+    id: string;
+    name: string;
+    targetUrl: string;
+    environment: string;
+  };
+  probe: {
+    statusCode: number | null;
+    statusText: string | null;
+    durationMs: number;
+    error: string | null;
+    finalUrl: string;
+    redirected: boolean;
+  };
+  burpAssessment: {
+    id: string;
+    assessmentNumber: string;
+    findingsCreated: number;
+  };
+  owaspAssessment: {
+    id: string;
+    assessmentNumber: string;
+    testsCreated: number;
+    findingsCreated: number;
+  };
+  summary: {
+    checksRun: number;
+    issuesFound: number;
+    pass: number;
+    fail: number;
+    notTested: number;
+  };
+};
+
 export type Methodology = "BURP" | "OWASP";
 export type AssessmentStatus = "DRAFT" | "IN_PROGRESS" | "COMPLETED";
 

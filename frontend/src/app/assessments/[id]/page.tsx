@@ -154,7 +154,13 @@ export default async function AssessmentDetailPage({ params }: Props) {
               href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/reports/${assessment.id}/pdf`}
               className="rounded-md bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent/90"
             >
-              Generate Report
+              PDF
+            </a>
+            <a
+              href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"}/api/reports/${assessment.id}/excel`}
+              className="rounded-md border border-border px-4 py-2 text-sm font-medium hover:bg-background"
+            >
+              Excel
             </a>
           </div>
         </div>

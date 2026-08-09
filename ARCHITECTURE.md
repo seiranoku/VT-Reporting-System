@@ -82,7 +82,9 @@ Volumes:
 
 ## Non-goals (MVP)
 
-No Redis, Kafka, RabbitMQ, Elasticsearch, MinIO, Kubernetes, or Burp Suite API integration.
+No Redis, Kafka, RabbitMQ, Elasticsearch, MinIO, or Kubernetes.
+
+Light automated scanning is supported via `POST /api/scans/start` (HTTP probe + header/injection heuristics). Full Burp Suite Enterprise / ZAP orchestration is out of scope for this phase.
 
 ## Phase plan
 
@@ -96,3 +98,4 @@ No Redis, Kafka, RabbitMQ, Elasticsearch, MinIO, Kubernetes, or Burp Suite API i
 8. PDF reports
 9. Dashboard
 10. Testing & cleanup
+11. Auto-scan (light): URL + method + body → Burp & OWASP assessments

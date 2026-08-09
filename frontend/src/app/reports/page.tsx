@@ -23,7 +23,8 @@ export default async function ReportsPage() {
           Reports
         </h2>
         <p className="mt-1 text-sm text-foreground/70">
-          Generate Burp Suite or OWASP PDF reports from completed assessments.
+          Unduh laporan assessment (Burp Suite / OWASP) dalam format PDF atau
+          Excel. Penjelasan laporan menggunakan Bahasa Indonesia.
         </p>
       </section>
 
@@ -87,7 +88,13 @@ export default async function ReportsPage() {
                         href={`${PUBLIC_API}/api/reports/${a.id}/pdf`}
                         className="font-medium text-accent hover:underline"
                       >
-                        Download PDF
+                        PDF
+                      </a>
+                      <a
+                        href={`${PUBLIC_API}/api/reports/${a.id}/excel`}
+                        className="font-medium text-accent hover:underline"
+                      >
+                        Excel
                       </a>
                     </div>
                   </td>

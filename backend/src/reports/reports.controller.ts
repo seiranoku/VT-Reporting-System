@@ -34,11 +34,51 @@ export class ReportsController {
     return this.sendPdf(assessmentId, res);
   }
 
+  @Get(':assessmentId/excel')
+  @ApiOperation({ summary: 'Generate and download Excel report' })
+  @ApiProduces(
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  )
+  async downloadExcelGet(
+    @Param('assessmentId') assessmentId: string,
+    @Res() res: Response,
+  ) {
+    return this.sendExcel(assessmentId, res);
+  }
+
+  @Post(':assessmentId/excel')
+  @ApiOperation({ summary: 'Generate Excel report (POST)' })
+  @ApiProduces(
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  )
+  async downloadExcelPost(
+    @Param('assessmentId') assessmentId: string,
+    @Res() res: Response,
+  ) {
+    return this.sendExcel(assessmentId, res);
+  }
+
   private async sendPdf(assessmentId: string, res: Response) {
     const { buffer, filename } =
       await this.reportService.generatePdf(assessmentId);
 
     res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${filename}"`,
+    );
+    res.setHeader('Content-Length', buffer.length);
+    res.send(buffer);
+  }
+
+  private async sendExcel(assessmentId: string, res: Response) {
+    const { buffer, filename } =
+      await this.reportService.generateExcel(assessmentId);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
     res.setHeader(
       'Content-Disposition',
       `attachment; filename="${filename}"`,

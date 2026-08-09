@@ -69,7 +69,7 @@ export class PdfService {
     doc
       .fontSize(22)
       .fillColor('#0f1c2e')
-      .text('VULNERABILITY TESTING REPORT', { align: 'center' });
+      .text(title.toUpperCase(), { align: 'center' });
 
     doc.moveDown(0.5);
     doc.fontSize(16).fillColor('#1f6feb').text(methodologyLabel, {

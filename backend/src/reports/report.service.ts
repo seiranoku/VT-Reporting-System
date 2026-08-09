@@ -6,6 +6,7 @@ import {
 import { Methodology } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { BurpReportService } from './burp-report.service';
+import { ExcelReportService } from './excel-report.service';
 import { OwaspReportService } from './owasp-report.service';
 import type { ReportAssessmentData } from './report.types';
 
@@ -15,6 +16,7 @@ export class ReportService {
     private readonly prisma: PrismaService,
     private readonly burpReportService: BurpReportService,
     private readonly owaspReportService: OwaspReportService,
+    private readonly excelReportService: ExcelReportService,
   ) {}
 
   async getMetadata(assessmentId: string) {
@@ -46,7 +48,9 @@ export class ReportService {
         assessment.methodology === Methodology.BURP
           ? 'BURP_SUITE'
           : 'OWASP',
-      filename: this.buildFilename(assessment),
+      filenamePdf: this.buildFilename(assessment, 'pdf'),
+      filenameExcel: this.buildFilename(assessment, 'xlsx'),
+      filename: this.buildFilename(assessment, 'pdf'),
     };
   }
 
@@ -56,12 +60,28 @@ export class ReportService {
     methodology: Methodology;
   }> {
     const assessment = await this.loadAssessment(assessmentId);
-    const filename = this.buildFilename(assessment);
+    const filename = this.buildFilename(assessment, 'pdf');
 
     const buffer =
       assessment.methodology === Methodology.BURP
         ? await this.burpReportService.generate(assessment)
         : await this.owaspReportService.generate(assessment);
+
+    return {
+      buffer,
+      filename,
+      methodology: assessment.methodology,
+    };
+  }
+
+  async generateExcel(assessmentId: string): Promise<{
+    buffer: Buffer;
+    filename: string;
+    methodology: Methodology;
+  }> {
+    const assessment = await this.loadAssessment(assessmentId);
+    const filename = this.buildFilename(assessment, 'xlsx');
+    const buffer = await this.excelReportService.generate(assessment);
 
     return {
       buffer,
@@ -148,13 +168,16 @@ export class ReportService {
     };
   }
 
-  private buildFilename(assessment: {
-    assessmentNumber: string;
-    methodology: Methodology;
-  }): string {
+  private buildFilename(
+    assessment: {
+      assessmentNumber: string;
+      methodology: Methodology;
+    },
+    extension: 'pdf' | 'xlsx',
+  ): string {
     const safeNumber = assessment.assessmentNumber.replace(/[^\w.-]+/g, '_');
     const type =
       assessment.methodology === Methodology.BURP ? 'Burp' : 'OWASP';
-    return `VT_Report_${safeNumber}_${type}.pdf`;
+    return `VT_Report_${safeNumber}_${type}.${extension}`;
   }
 }

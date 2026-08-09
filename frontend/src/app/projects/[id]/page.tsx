@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ApiError, apiGet } from "@/lib/api";
 import type { Project } from "@/lib/types";
 import { DeleteProjectButton } from "@/components/delete-project-button";
+import { StartScanPanel } from "@/components/start-scan-panel";
 
 type AssessmentSummary = {
   id: string;
@@ -84,6 +85,15 @@ export default async function ProjectDetailPage({ params }: Props) {
       </section>
 
       <section className="rounded-lg border border-border bg-surface p-6">
+        <StartScanPanel
+          projectId={project.id}
+          projectName={project.name}
+          targetUrl={project.targetUrl}
+          environment={project.environment}
+        />
+      </section>
+
+      <section className="rounded-lg border border-border bg-surface p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h3 className="font-[family-name:var(--font-display)] text-lg font-semibold">
             Assessments
@@ -92,7 +102,7 @@ export default async function ProjectDetailPage({ params }: Props) {
             href={`/assessments/new?projectId=${project.id}`}
             className="text-sm font-medium text-accent hover:underline"
           >
-            + New Assessment
+            + New Assessment (manual)
           </Link>
         </div>
         {project.assessments.length === 0 ? (

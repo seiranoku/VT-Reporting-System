@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BurpReportService } from './burp-report.service';
+import { ExcelReportService } from './excel-report.service';
 import { OwaspReportService } from './owasp-report.service';
 import { PdfService } from './pdf.service';
 import { ReportService } from './report.service';
@@ -11,6 +12,7 @@ import { ReportsController } from './reports.controller';
     PdfService,
     BurpReportService,
     OwaspReportService,
+    ExcelReportService,
     ReportService,
   ],
   exports: [ReportService],

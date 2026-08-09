@@ -71,3 +71,26 @@ npm run dev
 - [x] Phase 8 — PDF reports
 - [x] Phase 9 — Dashboard metrics
 - [x] Phase 10 — Testing & cleanup
+- [x] Phase 11 — Auto-scan (light HTTP probe → Burp & OWASP)
+- [x] Phase 12 — Excel reports (Bahasa Indonesia)
+
+## Auto-scan
+
+Dari **New Project** atau detail project, isi API URL, method, headers, dan body, lalu **Mulai Assessment**.
+
+Backend akan:
+
+1. Probe endpoint
+2. Menjalankan cek ringan (HTTPS, security headers, CORS, disclosure, auth signal, light SQLi/XSS)
+3. Membuat Assessment **BURP** + **OWASP** beserta findings/checklist otomatis
+
+Ini bukan pengganti Burp Suite penuh — hasil perlu direview manual.
+
+## Laporan
+
+Unduh dari menu **Reports** atau halaman assessment:
+
+- PDF: `/api/reports/:assessmentId/pdf`
+- Excel: `/api/reports/:assessmentId/excel`
+
+Narasi laporan menggunakan Bahasa Indonesia; istilah teknis (severity, OWASP, HTTP, status, dll.) tetap dalam istilah baku.

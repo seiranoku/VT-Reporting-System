@@ -25,26 +25,26 @@ export class OwaspReportService {
       data.owaspTests,
     );
 
-    this.pdfService.coverPage(doc, 'Vulnerability Testing Report', 'OWASP', [
+    this.pdfService.coverPage(doc, 'Laporan Pengujian Kerentanan', 'OWASP', [
       { label: 'Project', value: project.name },
-      { label: 'Assessment Number', value: data.assessmentNumber },
+      { label: 'Nomor Assessment', value: data.assessmentNumber },
       { label: 'Target', value: project.targetUrl },
       { label: 'Environment', value: project.environment },
       { label: 'Tester', value: data.tester },
       {
-        label: 'Assessment Date',
+        label: 'Periode Pengujian',
         value: this.formatDateRange(data.startDate, data.endDate),
       },
     ]);
 
-    this.pdfService.sectionTitle(doc, '1. Executive Summary');
+    this.pdfService.sectionTitle(doc, '1. Ringkasan Eksekutif');
     this.pdfService.bodyText(
       doc,
-      `This report summarizes the OWASP Top 10 based Vulnerability Testing for ${project.name}.`,
+      `Laporan ini merangkum hasil Vulnerability Testing berbasis OWASP Top 10 terhadap ${project.name}.`,
     );
     this.pdfService.simpleTable(
       doc,
-      ['Test Result', 'Count'],
+      ['Hasil Test', 'Jumlah'],
       [
         ['Total Test', String(data.owaspTests.length)],
         ['PASS', String(testStats.PASS)],
@@ -57,7 +57,7 @@ export class OwaspReportService {
     doc.moveDown(0.4);
     this.pdfService.simpleTable(
       doc,
-      ['Severity', 'Count'],
+      ['Severity', 'Jumlah'],
       [
         ['Critical', String(severityCounts.CRITICAL)],
         ['High', String(severityCounts.HIGH)],
@@ -68,26 +68,26 @@ export class OwaspReportService {
       [200, 80],
     );
 
-    this.pdfService.sectionTitle(doc, '2. Scope');
+    this.pdfService.sectionTitle(doc, '2. Ruang Lingkup');
     this.pdfService.keyValue(doc, 'Project', project.name);
     this.pdfService.keyValue(doc, 'Target URL', project.targetUrl);
     this.pdfService.keyValue(doc, 'Environment', project.environment);
     this.pdfService.keyValue(
       doc,
-      'Assessment Date',
+      'Periode Pengujian',
       this.formatDateRange(data.startDate, data.endDate),
     );
 
-    this.pdfService.sectionTitle(doc, '3. Methodology');
+    this.pdfService.sectionTitle(doc, '3. Metodologi');
     this.pdfService.bodyText(
       doc,
-      'The assessment followed the OWASP Top 10 categories. For each category, test cases were defined with objectives and procedures. Results were recorded as PASS, FAIL, NOT APPLICABLE, or NOT TESTED. Failed tests produced findings with severity and remediation guidance.',
+      'Assessment mengikuti kategori OWASP Top 10. Untuk setiap kategori, test case disusun dengan objektif dan prosedur. Hasil dicatat sebagai PASS, FAIL, NOT APPLICABLE, atau NOT TESTED. Test yang FAIL menghasilkan temuan beserta severity dan rekomendasi perbaikan.',
     );
 
-    this.pdfService.sectionTitle(doc, '4. OWASP Summary');
+    this.pdfService.sectionTitle(doc, '4. Ringkasan OWASP');
     this.pdfService.simpleTable(
       doc,
-      ['Category', 'PASS', 'FAIL', 'N/A', 'Not Tested'],
+      ['Kategori', 'PASS', 'FAIL', 'N/A', 'Not Tested'],
       categorySummary.map((row) => [
         `${row.code} ${row.name}`,
         String(row.PASS),
@@ -98,9 +98,12 @@ export class OwaspReportService {
       [220, 50, 50, 50, 70],
     );
 
-    this.pdfService.sectionTitle(doc, '5. Detailed Findings');
+    this.pdfService.sectionTitle(doc, '5. Detail Temuan');
     if (data.findings.length === 0) {
-      this.pdfService.bodyText(doc, 'No findings were recorded for this assessment.');
+      this.pdfService.bodyText(
+        doc,
+        'Tidak ada temuan yang dicatat pada assessment ini.',
+      );
     } else {
       data.findings.forEach((finding, index) => {
         this.pdfService.ensureSpace(doc, 140);
@@ -109,24 +112,28 @@ export class OwaspReportService {
           .fontSize(11)
           .fillColor('#0f1c2e')
           .text(
-            `Finding ${String(index + 1).padStart(3, '0')}: ${finding.title}`,
+            `Temuan ${String(index + 1).padStart(3, '0')}: ${finding.title}`,
           );
         doc.moveDown(0.4);
 
         this.pdfService.keyValue(
           doc,
-          'OWASP Category',
+          'Kategori OWASP',
           finding.owaspCategory
             ? `${finding.owaspCategory.code} — ${finding.owaspCategory.name}`
             : '—',
         );
         this.pdfService.keyValue(doc, 'Severity', finding.severity);
-        this.pdfService.keyValue(doc, 'Description', finding.description ?? '—');
-        this.pdfService.keyValue(doc, 'Impact', finding.impact ?? '—');
-        this.pdfService.keyValue(doc, 'Affected URL', finding.affectedUrl ?? '—');
+        this.pdfService.keyValue(doc, 'Deskripsi', finding.description ?? '—');
+        this.pdfService.keyValue(doc, 'Dampak (Impact)', finding.impact ?? '—');
         this.pdfService.keyValue(
           doc,
-          'Recommendation',
+          'URL Terdampak',
+          finding.affectedUrl ?? '—',
+        );
+        this.pdfService.keyValue(
+          doc,
+          'Rekomendasi',
           finding.recommendation ?? '—',
         );
         this.pdfService.keyValue(doc, 'Status', finding.status);
@@ -157,17 +164,17 @@ export class OwaspReportService {
             finding.evidences.map((e) => e.fileName).join(', '),
           );
         } else {
-          this.pdfService.keyValue(doc, 'Evidence', 'None');
+          this.pdfService.keyValue(doc, 'Evidence', 'Tidak ada');
         }
 
         doc.moveDown(0.8);
       });
     }
 
-    this.pdfService.sectionTitle(doc, '6. Conclusion');
+    this.pdfService.sectionTitle(doc, '6. Kesimpulan');
     this.pdfService.bodyText(
       doc,
-      `The OWASP assessment covered ${data.owaspCategories.length} Top 10 categories with ${data.owaspTests.length} test case(s). ${testStats.FAIL} test(s) failed and produced ${data.findings.length} finding(s). Remaining NOT TESTED items should be completed in a follow-up assessment. Priority remediation is recommended for Critical and High severity findings.`,
+      `Assessment OWASP mencakup ${data.owaspCategories.length} kategori Top 10 dengan ${data.owaspTests.length} test case. ${testStats.FAIL} test berstatus FAIL dan menghasilkan ${data.findings.length} temuan. Item NOT TESTED sebaiknya dilanjutkan pada assessment berikutnya. Prioritaskan remediasi temuan Critical dan High.`,
     );
 
     this.pdfService.drawHeaderFooter(doc, `${data.assessmentNumber} · OWASP`);

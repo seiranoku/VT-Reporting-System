@@ -11,6 +11,7 @@ import { OwaspModule } from './owasp/owasp.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProjectsModule } from './projects/projects.module';
 import { ReportsModule } from './reports/reports.module';
+import { ScansModule } from './scans/scans.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ReportsModule } from './reports/reports.module';
     OwaspModule,
     ReportsModule,
     DashboardModule,
+    ScansModule,
   ],
   controllers: [AppController],
   providers: [AppService],
