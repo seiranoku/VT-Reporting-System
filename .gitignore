@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build
+dist/
+.next/
+out/
+build/
+*.tsbuildinfo
+tsconfig.build.tsbuildinfo
+
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Logs / coverage
+logs/
+*.log
+npm-debug.log*
+coverage/
+.nyc_output/
+
+# Storage (local uploads)
+storage/
+backend/storage/
+
+# Prisma
+backend/prisma/*.db
+backend/prisma/*.db-journal
+
+# Docker
+*.pid

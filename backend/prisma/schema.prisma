@@ -1,0 +1,198 @@
+// VT Reporting System — Prisma schema (MVP)
+// CVSS fields are optional placeholders for future risk scoring.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  TESTER
+  VIEWER
+}
+
+enum Methodology {
+  BURP
+  OWASP
+}
+
+enum AssessmentStatus {
+  DRAFT
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum Severity {
+  CRITICAL
+  HIGH
+  MEDIUM
+  LOW
+  INFORMATIONAL
+}
+
+enum Confidence {
+  CERTAIN
+  FIRM
+  TENTATIVE
+}
+
+enum FindingStatus {
+  OPEN
+  IN_PROGRESS
+  FIXED
+  RETEST
+  CLOSED
+}
+
+enum OwaspTestResult {
+  PASS
+  FAIL
+  NOT_APPLICABLE
+  NOT_TESTED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  name         String
+  role         Role       @default(TESTER)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  auditLogs    AuditLog[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String       @id @default(cuid())
+  name        String
+  description String?
+  targetUrl   String       @map("target_url")
+  environment String
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  assessments Assessment[]
+
+  @@map("projects")
+}
+
+model Assessment {
+  id               String           @id @default(cuid())
+  projectId        String           @map("project_id")
+  assessmentNumber String           @unique @map("assessment_number")
+  methodology      Methodology
+  tester           String
+  startDate        DateTime?        @map("start_date")
+  endDate          DateTime?        @map("end_date")
+  description      String?
+  status           AssessmentStatus @default(DRAFT)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  project    Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  findings   Finding[]
+  owaspTests OwaspTest[]
+
+  @@index([projectId])
+  @@map("assessments")
+}
+
+model OwaspCategory {
+  id          String      @id @default(cuid())
+  code        String      @unique
+  name        String
+  description String?
+  sortOrder   Int         @map("sort_order")
+  owaspTests  OwaspTest[]
+  findings    Finding[]
+
+  @@map("owasp_categories")
+}
+
+model OwaspTest {
+  id            String          @id @default(cuid())
+  assessmentId  String          @map("assessment_id")
+  categoryId    String          @map("category_id")
+  testCase      String          @map("test_case")
+  testObjective String?         @map("test_objective")
+  testProcedure String?         @map("test_procedure")
+  result        OwaspTestResult @default(NOT_TESTED)
+  notes         String?
+  createdAt     DateTime        @default(now()) @map("created_at")
+  updatedAt     DateTime        @updatedAt @map("updated_at")
+
+  assessment Assessment    @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  category   OwaspCategory @relation(fields: [categoryId], references: [id])
+  findings   Finding[]
+
+  @@index([assessmentId])
+  @@index([categoryId])
+  @@map("owasp_tests")
+}
+
+model Finding {
+  id              String        @id @default(cuid())
+  assessmentId    String        @map("assessment_id")
+  owaspCategoryId String?       @map("owasp_category_id")
+  owaspTestId     String?       @map("owasp_test_id")
+  title           String
+  severity        Severity
+  confidence      Confidence?
+  affectedUrl     String?       @map("affected_url")
+  httpMethod      String?       @map("http_method")
+  parameter       String?
+  description     String?
+  impact          String?
+  recommendation  String?
+  reference       String?
+  status          FindingStatus @default(OPEN)
+  cvssScore       Float?        @map("cvss_score")
+  cvssVector      String?       @map("cvss_vector")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  assessment    Assessment     @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  owaspCategory OwaspCategory? @relation(fields: [owaspCategoryId], references: [id])
+  owaspTest     OwaspTest?     @relation(fields: [owaspTestId], references: [id], onDelete: SetNull)
+  evidences     Evidence[]
+
+  @@index([assessmentId])
+  @@index([severity])
+  @@index([status])
+  @@map("findings")
+}
+
+model Evidence {
+  id        String   @id @default(cuid())
+  findingId String   @map("finding_id")
+  fileName  String   @map("file_name")
+  filePath  String   @map("file_path")
+  mimeType  String   @map("mime_type")
+  fileSize  Int      @map("file_size")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  finding Finding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@index([findingId])
+  @@map("evidences")
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  action    String
+  entity    String
+  entityId  String?  @map("entity_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([entity, entityId])
+  @@map("audit_logs")
+}
