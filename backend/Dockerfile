@@ -12,7 +12,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN rm -f tsconfig.build.tsbuildinfo && npm run build \
-  && test -f dist/main.js
+  && test -s dist/main.js
 
 FROM node:22-alpine AS runner
 WORKDIR /app
